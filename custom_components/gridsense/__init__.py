@@ -98,11 +98,19 @@ async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
             ResourceStorageCollection,
         )
 
-        lovelace_data = hass.data.get("lovelace", {})
-        resources: ResourceStorageCollection | None = lovelace_data.get("resources")
+        # hass.data["lovelace"] is a LovelaceData object, not a dict —
+        # access .resources as an attribute.
+        lovelace_data = hass.data.get("lovelace")
+        if lovelace_data is None:
+            LOGGER.debug("GridSense: lovelace not loaded yet")
+            await _async_notify_yaml_mode(hass)
+            return
+
+        resources = getattr(lovelace_data, "resources", None)
 
         if not isinstance(resources, ResourceStorageCollection):
             # YAML mode — notify the user once
+            LOGGER.debug("GridSense: lovelace in YAML mode, showing notification")
             await _async_notify_yaml_mode(hass)
             return
 
@@ -115,17 +123,21 @@ async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
                         item["id"],
                         {"res_type": "module", "url": resource_url},
                     )
-                    LOGGER.debug("GridSense: updated Lovelace resource to %s", resource_url)
+                    LOGGER.info("GridSense: updated Lovelace resource to %s", resource_url)
                 return
 
         await resources.async_create_item({"res_type": "module", "url": resource_url})
-        LOGGER.debug("GridSense: registered Lovelace resource %s", resource_url)
+        LOGGER.info("GridSense: registered Lovelace resource %s", resource_url)
+
+        # Dismiss any leftover YAML-mode notification from a previous attempt
+        pn_dismiss(hass, _NOTIFICATION_ID)
 
     except Exception:  # noqa: BLE001
         LOGGER.warning(
             "GridSense: could not auto-register Lovelace resource. "
             "Add it manually: %s",
             resource_url,
+            exc_info=True,
         )
         await _async_notify_yaml_mode(hass)
 
