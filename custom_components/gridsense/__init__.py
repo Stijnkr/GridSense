@@ -9,11 +9,15 @@ On load this integration:
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from homeassistant.components.http import StaticPathConfig
-from homeassistant.components.persistent_notification import async_create as pn_create
+from homeassistant.components.persistent_notification import (
+    async_create as pn_create,
+    async_dismiss as pn_dismiss,
+)
 from homeassistant.const import Platform
 
 from .const import DOMAIN, LOGGER
@@ -26,8 +30,10 @@ PLATFORMS: list[Platform] = [Platform.SENSOR]
 
 _URL_BASE = "/gridsense"
 _CARD_FILE = "gridsense-card.js"
-_CARD_VERSION = "0.1.0"
+_MANIFEST = json.loads((Path(__file__).parent / "manifest.json").read_text())
+_CARD_VERSION: str = _MANIFEST["version"]
 _RESOURCE_URL = f"{_URL_BASE}/{_CARD_FILE}"
+_NOTIFICATION_ID = f"{DOMAIN}_lovelace_resource"
 
 
 # ──────────────────────────────────────────────────────────
@@ -116,12 +122,6 @@ async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
 
 async def _async_notify_yaml_mode(hass: HomeAssistant) -> None:
     """Show a one-time persistent notification for YAML-mode users."""
-    notification_id = f"{DOMAIN}_lovelace_resource"
-
-    # Only show once
-    if hass.states.get(f"persistent_notification.{notification_id}"):
-        return
-
     resource_url = f"{_RESOURCE_URL}?v={_CARD_VERSION}"
     pn_create(
         hass,
@@ -138,6 +138,6 @@ async def _async_notify_yaml_mode(hass: HomeAssistant) -> None:
             "```\n\n"
             "Then add a card with `type: custom:gridsense-card`."
         ),
-        notification_id=notification_id,
+        notification_id=_NOTIFICATION_ID,
     )
 
