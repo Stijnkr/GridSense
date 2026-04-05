@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from homeassistant.components.persistent_notification import async_create as pn_create
 from homeassistant.const import Platform
 
 from .const import DOMAIN, LOGGER
@@ -119,7 +120,8 @@ async def _async_notify_yaml_mode(hass: HomeAssistant) -> None:
         return
 
     resource_url = f"{_RESOURCE_URL}?v={_CARD_VERSION}"
-    hass.components.persistent_notification.async_create(
+    pn_create(
+        hass,
         title="GridSense — manual step required",
         message=(
             "GridSense could not auto-register its Lovelace card "
@@ -135,3 +137,4 @@ async def _async_notify_yaml_mode(hass: HomeAssistant) -> None:
         ),
         notification_id=notification_id,
     )
+

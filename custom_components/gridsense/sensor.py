@@ -15,8 +15,9 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import UnitOfPower, PERCENTAGE
+from homeassistant.const import PERCENTAGE, UnitOfPower
 from homeassistant.core import Event, EventStateChangedData, callback
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.event import async_track_state_change_event
 
 from .const import (
@@ -99,7 +100,7 @@ async def async_setup_entry(
     """Set up GridSense sensors from a config entry."""
     # options override data so entity assignments can be changed after initial setup
     config = {**entry.data, **entry.options}
-    entities = [
+    async_add_entities(
         GridSenseVirtualSensor(
             entry=entry,
             description=desc,
@@ -107,8 +108,7 @@ async def async_setup_entry(
         )
         for desc in SENSOR_DESCRIPTIONS
         if config.get(desc.conf_key)
-    ]
-    async_add_entities(entities)
+    )
 
 
 class GridSenseVirtualSensor(SensorEntity):
@@ -131,16 +131,12 @@ class GridSenseVirtualSensor(SensorEntity):
         self.entity_description = description
         self._source_entity_id = source_entity_id
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
-        self._attr_extra_state_attributes: dict = {}
-
-        # Device grouping — all GridSense sensors belong to the same device
-        from homeassistant.helpers.device_registry import DeviceInfo
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name="GridSense",
             manufacturer="GridSense",
             model="Energy Dashboard",
-            entry_type="service",  # type: ignore[arg-type]
+            entry_type=DeviceEntryType.SERVICE,
         )
 
     # ------------------------------------------------------------------
@@ -149,12 +145,10 @@ class GridSenseVirtualSensor(SensorEntity):
 
     async def async_added_to_hass(self) -> None:
         """Subscribe to source entity state changes."""
-        # Seed with current state
         source_state = self.hass.states.get(self._source_entity_id)
         if source_state is not None:
             self._update_from_state_value(source_state.state)
 
-        # Track future changes
         self.async_on_remove(
             async_track_state_change_event(
                 self.hass,
@@ -187,10 +181,6 @@ class GridSenseVirtualSensor(SensorEntity):
                 self._source_entity_id,
             )
             self._attr_native_value = None
-
-    # ------------------------------------------------------------------
-    # Extra attributes
-    # ------------------------------------------------------------------
 
     @property
     def extra_state_attributes(self) -> dict:
