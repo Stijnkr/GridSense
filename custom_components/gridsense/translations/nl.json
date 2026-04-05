@@ -1,0 +1,38 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "GridSense — Koppel je energie-entiteiten",
+                "description": "Selecteer bestaande Home Assistant sensor-entiteiten voor elke energiebron. Warmtepomp en batterij zijn optioneel.\n\nNa de installatie is de **GridSense Energy Dashboard** kaart (`custom:gridsense-card`) automatisch beschikbaar in de Lovelace kaartenkiezer.",
+                "data": {
+                    "solar_entity": "Zonnepanelen vermogen entiteit (W)",
+                    "home_entity": "Thuisverbruik entiteit (W)",
+                    "heat_pump_entity": "Warmtepomp vermogen entiteit (W)",
+                    "grid_entity": "Net vermogen entiteit (W, negatief = terugleveren)",
+                    "battery_entity": "Batterij laadstatus entiteit (%)"
+                }
+            }
+        },
+        "error": {
+            "unknown": "Er is een onverwachte fout opgetreden."
+        },
+        "abort": {
+            "already_configured": "GridSense is al geconfigureerd."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "GridSense — Entiteiten bijwerken",
+                "description": "Pas de bronentiteiten aan voor elke energiebron.",
+                "data": {
+                    "solar_entity": "Zonnepanelen vermogen entiteit (W)",
+                    "home_entity": "Thuisverbruik entiteit (W)",
+                    "heat_pump_entity": "Warmtepomp vermogen entiteit (W)",
+                    "grid_entity": "Net vermogen entiteit (W, negatief = terugleveren)",
+                    "battery_entity": "Batterij laadstatus entiteit (%)"
+                }
+            }
+        }
+    }
+}

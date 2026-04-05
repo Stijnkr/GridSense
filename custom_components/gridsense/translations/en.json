@@ -1,0 +1,38 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "GridSense — Link your energy entities",
+                "description": "Select your existing Home Assistant sensor entities for each energy source. Heat pump and battery are optional.\n\nAfter setup a **GridSense Energy Dashboard** card (`custom:gridsense-card`) is automatically available in your Lovelace card picker.",
+                "data": {
+                    "solar_entity": "Solar power entity (W)",
+                    "home_entity": "Home consumption entity (W)",
+                    "heat_pump_entity": "Heat pump power entity (W)",
+                    "grid_entity": "Grid power entity (W, negative = exporting)",
+                    "battery_entity": "Battery state of charge entity (%)"
+                }
+            }
+        },
+        "error": {
+            "unknown": "An unexpected error occurred."
+        },
+        "abort": {
+            "already_configured": "GridSense is already configured."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "GridSense — Update entity assignments",
+                "description": "Update the source entities for each energy source.",
+                "data": {
+                    "solar_entity": "Solar power entity (W)",
+                    "home_entity": "Home consumption entity (W)",
+                    "heat_pump_entity": "Heat pump power entity (W)",
+                    "grid_entity": "Grid power entity (W, negative = exporting)",
+                    "battery_entity": "Battery state of charge entity (%)"
+                }
+            }
+        }
+    }
+}
