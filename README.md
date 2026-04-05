@@ -1,46 +1,135 @@
-# Notice
+# GridSense
 
-The component and platforms in this repository are not meant to be used by a
-user, but as a "blueprint" that custom component developers can build
-upon, to make more awesome stuff.
+A [HACS](https://hacs.xyz) integration for Home Assistant that gives you a real-time energy flow dashboard — without requiring any extra integrations.
 
-HAVE FUN! 😎
+Link your existing Home Assistant sensors (solar, home consumption, grid, battery, heat pump) and GridSense creates a unified set of virtual sensors plus a built-in Lovelace card that visualises the energy flow in your home.
 
-## Why?
+---
 
-This is simple, by having custom_components look (README + structure) the same
-it is easier for developers to help each other and for users to start using them.
+## Features
 
-If you are a developer and you want to add things to this "blueprint" that you think more
-developers will have use for, please open a PR to add it :)
+- **Virtual sensors** — mirrors your existing HA entities under a single `gridsense` device
+- **Real-time updates** — uses state-change events, no polling
+- **Bundled Lovelace card** (`custom:gridsense-card`) — auto-registered on install, no manual resource setup needed
+- **Animated energy flow** — directional flow lines show where energy is going
+- **Derived stats** — self-consumption %, solar surplus, grid import/export status
+- **Options flow** — reassign entities at any time via Instellingen → Integraties
 
-## What?
+---
 
-This repository contains multiple files, here is a overview:
+## Installation via HACS
 
-File | Purpose | Documentation
--- | -- | --
-`.devcontainer.json` | Used for development/testing with Visual Studio Code. | [Documentation](https://code.visualstudio.com/docs/remote/containers)
-`.github/ISSUE_TEMPLATE/*.yml` | Templates for the issue tracker | [Documentation](https://help.github.com/en/github/building-a-strong-community/configuring-issue-templates-for-your-repository)
-`custom_components/integration_blueprint/*` | Integration files, this is where everything happens. | [Documentation](https://developers.home-assistant.io/docs/creating_component_index)
-`CONTRIBUTING.md` | Guidelines on how to contribute. | [Documentation](https://help.github.com/en/github/building-a-strong-community/setting-guidelines-for-repository-contributors)
-`LICENSE` | The license file for the project. | [Documentation](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/licensing-a-repository)
-`README.md` | The file you are reading now, should contain info about the integration, installation and configuration instructions. | [Documentation](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax)
-`requirements.txt` | Python packages used for development/lint/testing this integration. | [Documentation](https://pip.pypa.io/en/stable/user_guide/#requirements-files)
+1. In Home Assistant open **HACS → Integraties**
+2. Klik **⋮ → Custom repositories**
+3. Voeg toe: `https://github.com/Stijnkr/GridSense` — categorie **Integration**
+4. Zoek **GridSense** en klik **Installeren**
+5. Herstart Home Assistant
 
-## How?
+---
 
-1. Create a new repository in GitHub, using this repository as a template by clicking the "Use this template" button in the GitHub UI.
-1. Open your new repository in Visual Studio Code devcontainer (Preferably with the "`Dev Containers: Clone Repository in Named Container Volume...`" option).
-1. Rename all instances of the `integration_blueprint` to `custom_components/<your_integration_domain>` (e.g. `custom_components/awesome_integration`).
-1. Rename all instances of the `Integration Blueprint` to `<Your Integration Name>` (e.g. `Awesome Integration`).
-1. Run the `scripts/develop` to start HA and test out your new integration.
+## Setup
 
-## Next steps
+1. Ga naar **Instellingen → Integraties → + Toevoegen → GridSense**
+2. Koppel je bestaande sensor-entiteiten:
 
-These are some next steps you may want to look into:
-- Add tests to your integration, [`pytest-homeassistant-custom-component`](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component) can help you get started.
-- Add brand images (logo/icon).
-- Create your first release.
-- Share your integration on the [Home Assistant Forum](https://community.home-assistant.io/).
-- Submit your integration to [HACS](https://hacs.xyz/docs/publish/start).
+| Veld | Eenheid | Verplicht |
+|---|---|---|
+| Solar power entity | W | ✅ |
+| Home consumption entity | W | ✅ |
+| Grid power entity | W (negatief = terugleveren) | ✅ |
+| Heat pump power entity | W | ➖ optioneel |
+| Battery state of charge entity | % | ➖ optioneel |
+
+3. GridSense maakt de sensoren aan en registreert de Lovelace card automatisch.
+
+---
+
+## Lovelace card
+
+Na de setup is de card direct beschikbaar in de kaartenkiezer als **GridSense Energy Dashboard**.
+
+Minimale configuratie:
+```yaml
+type: custom:gridsense-card
+```
+
+Eigen entiteiten overschrijven (als je de integratie niet gebruikt):
+```yaml
+type: custom:gridsense-card
+solar_entity: sensor.mijn_zonnepanelen
+home_entity: sensor.mijn_verbruik
+grid_entity: sensor.mijn_net
+battery_entity: sensor.mijn_batterij
+heat_pump_entity: sensor.mijn_warmtepomp
+title: "Mijn Energie"
+```
+
+---
+
+## Testen zonder hardware
+
+Voeg tijdelijke template-sensoren toe aan `configuration.yaml`:
+
+```yaml
+template:
+  - sensor:
+      - name: "Test Solar"
+        unit_of_measurement: "W"
+        state: "604"
+      - name: "Test Home"
+        unit_of_measurement: "W"
+        state: "93"
+      - name: "Test Grid"
+        unit_of_measurement: "W"
+        state: "-511"
+      - name: "Test Battery"
+        unit_of_measurement: "%"
+        state: "42"
+      - name: "Test Heat Pump"
+        unit_of_measurement: "W"
+        state: "0"
+```
+
+Koppel vervolgens `sensor.test_solar` etc. in de GridSense config flow.
+
+---
+
+## Projectstructuur
+
+```
+custom_components/gridsense/
+├── __init__.py          # Setup + automatische Lovelace resource registratie
+├── config_flow.py       # Config flow + options flow met entity selectors
+├── const.py             # Constanten
+├── manifest.json
+├── sensor.py            # Virtuele sensoren (local_push)
+├── translations/
+│   ├── en.json
+│   └── nl.json
+└── www/
+    └── gridsense-card.js   # Lovelace card (gebundeld)
+```
+
+---
+
+## Development
+
+Open de repo in VS Code en gebruik de ingebouwde devcontainer:
+
+```
+Dev Containers: Reopen in Container
+```
+
+Start daarna Home Assistant:
+
+```bash
+scripts/develop
+```
+
+HA draait op `http://localhost:8123`.
+
+---
+
+## Licentie
+
+MIT — zie [LICENSE](LICENSE).
