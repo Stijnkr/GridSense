@@ -1,6 +1,20 @@
-# GridSense
+<p align="center">
+  <img src="custom_components/gridsense/logo.svg" alt="GridSense" width="120"/>
+</p>
 
-A [HACS](https://hacs.xyz) integration for Home Assistant that gives you a real-time energy flow dashboard — without requiring any extra integrations.
+<h1 align="center">GridSense</h1>
+
+<p align="center">
+  A <a href="https://hacs.xyz">HACS</a> integration for Home Assistant that gives you a real-time energy flow dashboard — without requiring any extra integrations.
+</p>
+
+<p align="center">
+  <a href="https://my.home-assistant.io/redirect/config_flow_start/?domain=gridsense">
+    <img src="https://my.home-assistant.io/badges/config_flow_start.svg" alt="Add Integration"/>
+  </a>
+</p>
+
+---
 
 Link your existing Home Assistant sensors (solar, home consumption, grid, battery, heat pump) and GridSense creates a unified set of virtual sensors plus a built-in Lovelace card that visualises the energy flow in your home.
 
