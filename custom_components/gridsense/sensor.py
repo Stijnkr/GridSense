@@ -97,14 +97,16 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up GridSense sensors from a config entry."""
+    # options override data so entity assignments can be changed after initial setup
+    config = {**entry.data, **entry.options}
     entities = [
         GridSenseVirtualSensor(
             entry=entry,
             description=desc,
-            source_entity_id=entry.data[desc.conf_key],
+            source_entity_id=config[desc.conf_key],
         )
         for desc in SENSOR_DESCRIPTIONS
-        if desc.conf_key in entry.data
+        if config.get(desc.conf_key)
     ]
     async_add_entities(entities)
 

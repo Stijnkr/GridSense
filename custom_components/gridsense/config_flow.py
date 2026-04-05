@@ -63,8 +63,7 @@ class GridSenseConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Handle a flow initiated by the user."""
         if user_input is not None:
-            # Strip UNDEFINED optional fields
-            data = {k: v for k, v in user_input.items() if v is not vol.UNDEFINED}
+            data = {k: v for k, v in user_input.items() if v not in (None, "", vol.UNDEFINED)}
             return self.async_create_entry(title="GridSense", data=data)
 
         return self.async_show_form(
@@ -84,7 +83,7 @@ class GridSenseOptionsFlow(OptionsFlow):
 
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialise options flow."""
-        self._current = dict(config_entry.data)
+        self._current = {**config_entry.data, **config_entry.options}
 
     async def async_step_init(
         self,
@@ -92,7 +91,7 @@ class GridSenseOptionsFlow(OptionsFlow):
     ) -> ConfigFlowResult:
         """Handle options flow."""
         if user_input is not None:
-            data = {k: v for k, v in user_input.items() if v is not vol.UNDEFINED}
+            data = {k: v for k, v in user_input.items() if v not in (None, "", vol.UNDEFINED)}
             return self.async_create_entry(title="GridSense", data=data)
 
         return self.async_show_form(
