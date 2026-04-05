@@ -13,62 +13,62 @@ Link your existing Home Assistant sensors (solar, home consumption, grid, batter
 - **Bundled Lovelace card** (`custom:gridsense-card`) — auto-registered on install, no manual resource setup needed
 - **Animated energy flow** — directional flow lines show where energy is going
 - **Derived stats** — self-consumption %, solar surplus, grid import/export status
-- **Options flow** — reassign entities at any time via Instellingen → Integraties
+- **Options flow** — reassign entities at any time via Settings → Integrations
 
 ---
 
 ## Installation via HACS
 
-1. In Home Assistant open **HACS → Integraties**
-2. Klik **⋮ → Custom repositories**
-3. Voeg toe: `https://github.com/Stijnkr/GridSense` — categorie **Integration**
-4. Zoek **GridSense** en klik **Installeren**
-5. Herstart Home Assistant
+1. In Home Assistant open **HACS → Integrations**
+2. Click **⋮ → Custom repositories**
+3. Add: `https://github.com/Stijnkr/GridSense` — category **Integration**
+4. Search for **GridSense** and click **Download**
+5. Restart Home Assistant
 
 ---
 
 ## Setup
 
-1. Ga naar **Instellingen → Integraties → + Toevoegen → GridSense**
-2. Koppel je bestaande sensor-entiteiten:
+1. Go to **Settings → Integrations → + Add Integration → GridSense**
+2. Link your existing sensor entities:
 
-| Veld | Eenheid | Verplicht |
+| Field | Unit | Required |
 |---|---|---|
 | Solar power entity | W | ✅ |
 | Home consumption entity | W | ✅ |
-| Grid power entity | W (negatief = terugleveren) | ✅ |
-| Heat pump power entity | W | ➖ optioneel |
-| Battery state of charge entity | % | ➖ optioneel |
+| Grid power entity | W (negative = exporting) | ✅ |
+| Heat pump power entity | W | ➖ optional |
+| Battery state of charge entity | % | ➖ optional |
 
-3. GridSense maakt de sensoren aan en registreert de Lovelace card automatisch.
+3. GridSense creates the sensors and registers the Lovelace card automatically.
 
 ---
 
 ## Lovelace card
 
-Na de setup is de card direct beschikbaar in de kaartenkiezer als **GridSense Energy Dashboard**.
+After setup the card is immediately available in the card picker as **GridSense Energy Dashboard**.
 
-Minimale configuratie:
+Minimal configuration:
 ```yaml
 type: custom:gridsense-card
 ```
 
-Eigen entiteiten overschrijven (als je de integratie niet gebruikt):
+Override entities (if you want to use the card without the integration):
 ```yaml
 type: custom:gridsense-card
-solar_entity: sensor.mijn_zonnepanelen
-home_entity: sensor.mijn_verbruik
-grid_entity: sensor.mijn_net
-battery_entity: sensor.mijn_batterij
-heat_pump_entity: sensor.mijn_warmtepomp
-title: "Mijn Energie"
+solar_entity: sensor.my_solar
+home_entity: sensor.my_home
+grid_entity: sensor.my_grid
+battery_entity: sensor.my_battery
+heat_pump_entity: sensor.my_heat_pump
+title: "My Energy"
 ```
 
 ---
 
-## Testen zonder hardware
+## Testing without hardware
 
-Voeg tijdelijke template-sensoren toe aan `configuration.yaml`:
+Add temporary template sensors to `configuration.yaml`:
 
 ```yaml
 template:
@@ -90,46 +90,46 @@ template:
         state: "0"
 ```
 
-Koppel vervolgens `sensor.test_solar` etc. in de GridSense config flow.
+Then link `sensor.test_solar` etc. in the GridSense config flow.
 
 ---
 
-## Projectstructuur
+## Project structure
 
 ```
 custom_components/gridsense/
-├── __init__.py          # Setup + automatische Lovelace resource registratie
-├── config_flow.py       # Config flow + options flow met entity selectors
-├── const.py             # Constanten
+├── __init__.py          # Setup + automatic Lovelace resource registration
+├── config_flow.py       # Config flow + options flow with entity selectors
+├── const.py             # Constants
 ├── manifest.json
-├── sensor.py            # Virtuele sensoren (local_push)
+├── sensor.py            # Virtual sensors (local_push)
 ├── translations/
 │   ├── en.json
 │   └── nl.json
 └── www/
-    └── gridsense-card.js   # Lovelace card (gebundeld)
+    └── gridsense-card.js   # Bundled Lovelace card
 ```
 
 ---
 
 ## Development
 
-Open de repo in VS Code en gebruik de ingebouwde devcontainer:
+Open the repo in VS Code and use the built-in devcontainer:
 
 ```
 Dev Containers: Reopen in Container
 ```
 
-Start daarna Home Assistant:
+Then start Home Assistant:
 
 ```bash
 scripts/develop
 ```
 
-HA draait op `http://localhost:8123`.
+HA runs at `http://localhost:8123`.
 
 ---
 
-## Licentie
+## License
 
-MIT — zie [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
