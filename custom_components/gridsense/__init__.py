@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.components.persistent_notification import async_create as pn_create
 from homeassistant.const import Platform
 
@@ -36,11 +37,13 @@ _RESOURCE_URL = f"{_URL_BASE}/{_CARD_FILE}"
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:  # noqa: ARG001
     """Register the static HTTP path for the Lovelace card."""
     card_path = Path(__file__).parent / "www" / _CARD_FILE
-    hass.http.register_static_path(
-        f"{_URL_BASE}/{_CARD_FILE}",
-        str(card_path),
-        cache_headers=False,
-    )
+    await hass.http.async_register_static_paths([
+        StaticPathConfig(
+            url_path=f"{_URL_BASE}/{_CARD_FILE}",
+            path=str(card_path),
+            cache_headers=False,
+        )
+    ])
     return True
 
 
