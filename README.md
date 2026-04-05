@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="custom_components/gridsense/logo.svg" alt="GridSense" width="120"/>
+  <img src="custom_components/gridsense/brand/icon.png" alt="GridSense" width="120"/>
 </p>
 
 <h1 align="center">GridSense</h1>
