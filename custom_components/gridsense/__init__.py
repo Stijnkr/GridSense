@@ -18,7 +18,8 @@ from homeassistant.components.persistent_notification import (
     async_create as pn_create,
     async_dismiss as pn_dismiss,
 )
-from homeassistant.const import Platform
+from homeassistant.const import EVENT_HOMEASSISTANT_STARTED, Platform
+from homeassistant.core import CoreState, Event
 
 from .const import DOMAIN, LOGGER
 
@@ -55,7 +56,16 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:  # noqa: ARG00
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up GridSense from a config entry."""
-    await _async_register_lovelace_resource(hass)
+
+    async def _register(_event: Event | None = None) -> None:
+        await _async_register_lovelace_resource(hass)
+
+    # Lovelace is not yet loaded during early startup — defer until HA is running
+    if hass.state is CoreState.running:
+        await _register()
+    else:
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _register)
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
     return True
